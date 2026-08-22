@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>File Pipeline · 文件处理流水线</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <main class="shell">
+    <header><div><p class="eyebrow">FILE PIPELINE</p><h1>文件处理流水线</h1><p>持久化校验、提取、扫描与失败重试。</p></div><button id="refresh" class="secondary">刷新任务</button></header>
+    <section class="card upload-card">
+      <div><h2>上传文件</h2><p>支持 txt、json、csv、log、md、yaml、xml，最大 10 MiB。</p></div>
+      <form id="upload-form"><label id="drop-zone" class="drop-zone"><input id="file" name="file" type="file" required><span id="file-label">选择文件或拖放到此处</span></label><button type="submit">上传并创建任务</button></form>
+      <div id="progress-wrap" class="progress-wrap hidden"><div id="progress"></div></div><p id="notice" class="notice"></p>
+    </section>
+    <section class="card">
+      <div class="section-head"><div><h2>任务列表</h2><p id="count">正在加载…</p></div><div id="filters" class="filters"><button data-status="" class="active">全部</button><button data-status="PENDING">待处理</button><button data-status="PROCESSING">处理中</button><button data-status="SUCCEEDED">成功</button><button data-status="FAILED">失败</button><button data-status="DEAD">死信</button></div></div>
+      <div class="table-wrap"><table><thead><tr><th>任务 / 文件</th><th>大小</th><th>阶段</th><th>状态</th><th>创建时间</th><th>操作</th></tr></thead><tbody id="tasks"><tr><td colspan="6" class="empty">加载中…</td></tr></tbody></table></div>
+      <div class="pager"><button id="prev" class="secondary">上一页</button><span id="page">第 1 页</span><button id="next" class="secondary">下一页</button></div>
+    </section>
+    <section class="card detail-card"><div class="section-head"><div><h2>任务详情</h2><p>点击任务查看完整处理轨迹。</p></div><button id="close-detail" class="secondary">清空</button></div><div id="detail" class="empty">尚未选择任务</div></section>
+  </main>
+  <div id="toast" class="toast hidden"></div>
+  <script src="/static/app.js"></script>
+</body>
+</html>
