@@ -224,17 +224,4 @@ func writeDomainError(w http.ResponseWriter, err error) {
 		return
 	}
 	writeError(w, http.StatusInternalServerError, domain.ErrInternal, "服务内部错误")
-	return
-	status := http.StatusBadRequest
-	switch appErr.Code {
-	case domain.ErrTaskNotFound:
-		status = http.StatusNotFound
-	case domain.ErrTaskNotRetryable, domain.ErrTaskAlreadyFinal:
-		status = http.StatusConflict
-	case domain.ErrFileTooLarge:
-		status = http.StatusRequestEntityTooLarge
-	case domain.ErrInternal:
-		status = http.StatusInternalServerError
-	}
-	writeError(w, status, appErr.Code, appErr.Message)
 }
