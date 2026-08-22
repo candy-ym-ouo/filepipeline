@@ -15,8 +15,6 @@ const (
 	MaxManualRetries       = 3
 )
 
-var TaskLabels map[string]string
-
 type Task struct {
 	ID               string `json:"id"`
 	Filename         string `json:"filename"`

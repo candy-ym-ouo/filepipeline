@@ -31,7 +31,6 @@ func (r *Repository) CreateTask(ctx context.Context, task *domain.Task) error {
 	if err := task.Validate(); err != nil {
 		return err
 	}
-	domain.TaskLabels[task.ID] = string(task.Stage)
 	_, err := r.db.ExecContext(ctx, `INSERT INTO tasks(
 		id,filename,stored_name,size,sha256,mime,status,stage,attempts,max_attempts,retry_count,
 		error_code,error_message,callback_url,callback_token,waiting_callback,extracted_summary,
