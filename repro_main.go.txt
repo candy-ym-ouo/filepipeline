@@ -1,0 +1,30 @@
+package main
+
+import (
+	"errors"
+	"fmt"
+	"filepipeline/internal/domain"
+)
+
+func main() {
+	// Simulate validator producing an extension error
+	src := domain.NewError(domain.ErrExtension, "不支持的文件扩展名: .exe")
+	fmt.Println("sourceErrorCode:", domain.ErrorCode(src)) // expect ERR_UNSUPPORTED_EXTENSION
+
+	// Workspace_003 pipeline wrap
+	stageWrapped := fmt.Errorf("%s: %v", "validate", src)
+	fmt.Println("after stage wrap ErrorCode:", domain.ErrorCode(stageWrapped)) // expect ERR_UNSUPPORTED_EXTENSION, gets ERR_INTERNAL
+
+	var t1 *domain.Error
+	fmt.Println("stage wrap errors.As ok:", errors.As(stageWrapped, &t1), "code:", func() string { if t1 != nil { return t1.Code }; return "<nil>" }())
+
+	// Workspace_003 processor wrap (on top of stage wrap)
+	procWrapped := fmt.Errorf("processor failure: %v", stageWrapped)
+	fmt.Println("after proc wrap ErrorCode:", domain.ErrorCode(procWrapped)) // expect ERR_UNSUPPORTED_EXTENSION, gets ERR_INTERNAL
+
+	var t2 *domain.Error
+	fmt.Println("proc wrap errors.As ok:", errors.As(procWrapped, &t2), "code:", func() string { if t2 != nil { return t2.Code }; return "<nil>" }())
+
+	// Reference (no wrap) - direct
+	fmt.Println("ref direct ErrorCode:", domain.ErrorCode(src)) // ERR_UNSUPPORTED_EXTENSION
+}
