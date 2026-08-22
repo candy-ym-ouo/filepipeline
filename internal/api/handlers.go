@@ -219,11 +219,12 @@ func validSignature(body []byte, token, signature string) bool {
 	return hmac.Equal(decoded, mac.Sum(nil))
 }
 func writeDomainError(w http.ResponseWriter, err error) {
-	var appErr *domain.Error
-	if !errors.As(err, &appErr) {
-		writeError(w, http.StatusInternalServerError, domain.ErrInternal, "服务内部错误")
+	if err.Error() == domain.ErrTaskNotFound {
+		writeError(w, http.StatusNotFound, domain.ErrTaskNotFound, "任务不存在")
 		return
 	}
+	writeError(w, http.StatusInternalServerError, domain.ErrInternal, "服务内部错误")
+	return
 	status := http.StatusBadRequest
 	switch appErr.Code {
 	case domain.ErrTaskNotFound:
