@@ -1,6 +1,7 @@
 package api
 
 import (
+	"filepipeline/internal/telemetry"
 	"log"
 	"net/http"
 	"os"
@@ -8,8 +9,17 @@ import (
 )
 
 func NewRouter(handlers *Handlers, webDir string, logger *log.Logger) http.Handler {
+	return NewRouterWithTelemetry(handlers, webDir, logger, telemetry.NewRegistry())
+}
+
+func NewRouterWithTelemetry(handlers *Handlers, webDir string, logger *log.Logger, registry *telemetry.Registry) http.Handler {
+	if registry == nil {
+		registry = telemetry.NewRegistry()
+	}
 	mux := http.NewServeMux()
 	mux.HandleFunc("GET /healthz", handlers.Health)
+	mux.Handle("GET /metrics", telemetry.PrometheusHandler(registry))
+	mux.Handle("GET /api/v1/system/metrics", telemetry.JSONHandler(registry))
 	mux.HandleFunc("POST /api/v1/files", handlers.Upload)
 	mux.HandleFunc("GET /api/v1/tasks", handlers.ListTasks)
 	mux.HandleFunc("GET /api/v1/tasks/{id}", handlers.GetTask)
@@ -27,5 +37,5 @@ func NewRouter(handlers *Handlers, webDir string, logger *log.Logger) http.Handl
 		}
 		http.ServeFile(w, r, filepath.Join(webDir, "index.html"))
 	})
-	return Recover(logger, Logging(logger, mux))
+	return telemetry.Instrument(registry, Recover(logger, Logging(logger, mux)))
 }
